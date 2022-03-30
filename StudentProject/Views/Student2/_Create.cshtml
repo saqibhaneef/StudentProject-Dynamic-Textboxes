@@ -1,0 +1,147 @@
+﻿@model StudentProject.Models.StudentViewModel
+
+@{
+    Layout = null;
+}
+
+<form Id="SaveForm" method="post">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="col-md-12 input-group">
+            <div class="col-md-6 p-1">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input class="form-control" asp-for="FirstName" id="FirstName" placeholder="First Name" />
+                </div>
+            </div>
+            <div class="col-md-6 p-1">
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input class="form-control" asp-for="LastName" id="LastName" placeholder="LastName" />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 input-group">
+            <div class="form-group col-md-6 p-1">
+                <label>Father Name</label>
+                <input class="form-control" asp-for="FatherName" id="FatherName" placeholder="Father Name" />
+            </div>
+            <div class="form-group col-md-6 p-1">
+                <label>Class</label>
+                <input class="form-control" asp-for="Class" id="Class" placeholder="Class" />
+            </div>
+
+        </div>
+        <div class="col-md-12 input-group">
+            <div class="col-md-6 p-1">
+                <div class="form-group">
+                    <label>City</label>
+                    <input class="form-control" asp-for="City" id="City" placeholder="City" />
+                </div>
+            </div>
+            <div class="col-md-6 p-1">
+                <div class="form-group">
+                    <label>Country</label>
+                    <input class="form-control" asp-for="Country" id="Country" placeholder="Country" />
+                </div>
+            </div>
+        </div>
+        <button id="add" class="btn btn-primary p1">Add Address</button>
+        <div>
+            <div class="col-md-12 p-1" id="address">
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+    </div>
+</form>
+
+
+
+
+
+
+<script>
+
+    $("#SaveForm").submit(function (e) {
+            e.preventDefault();
+            console.log('Doing ajax submit');
+
+            var fdata = new FormData(this);
+            var addresses=JSON.stringify(GetAddresses());
+            fdata.append("addresses2",addresses);
+            $.ajax({
+                type: 'post',
+                url: "Student2/Create",
+                data: fdata,
+                processData: false,
+                contentType: false,
+                success:function(response){
+                    if(response=="ok")
+                    {                                                
+                        $('#ajaxresult').load('@Url.Action("_StudentsList")');
+                        $('#exampleModal').modal('hide');
+                        alert("Inserted");
+                    }
+                    else{
+                        alert("Insert failed");
+                    }
+                },
+                error:function(error)
+                {
+                    alert(error);
+                }
+
+            })
+        });
+
+
+                var i = 0;
+        $("#add").click(function (e) {
+            i++;
+            e.preventDefault();
+            $("#address").append('<div class="input-group p-1 row'+i+' rowDiv"><input type="text" style="width:90%" id="address' + i + '" name="address' + i + '"  class="form-control p-1 address" /><button type="button" class="btn btn-danger btn_remove" id="' + i + '" name="remove">X</button></div>');
+        });
+
+        //Remove input field
+        $(document).on('click', '.btn_remove', function () {
+            var button_id = $(this).attr("id");
+            $(".row" + button_id).each(function () {
+                $(this).remove();
+            });
+        });
+
+        function GetAddresses()
+        {
+            var DetailList = [];
+            var rowsCont = $('#address').children().length;
+            var count = 1;
+            $('#address').find('.rowDiv .address').each(function (){
+                var ob = {};
+                ob.Name = $(this).val();
+                DetailList.push(ob);
+                count++;
+            });
+            return DetailList;
+        }
+
+        function GetDetail()
+        {
+            var obj={};
+            obj.FirstName=$("#FirstName").val();
+            obj.LastName=$("#LastName").val();
+            obj.FatherName=$("#FatherName").val();
+            obj.Class=$("#Class").val();
+            obj.City=$("#City").val();
+            obj.Country=$("#Country").val();
+            return obj;
+        }
+
+
+
+</script>
