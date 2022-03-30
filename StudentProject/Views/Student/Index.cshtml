@@ -1,0 +1,140 @@
+﻿@model IEnumerable<StudentProject.Models.Student>
+
+<button type="button" class="btn btn-primary" id="btnAdd" data-bs-toggle="modal" data-bs-target="#exampleModal">Add New</button>
+
+<div id="ajaxresult">
+<partial name="_StudentsList" model="Model"></partial>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">         
+           <div id="modalBody">
+
+           </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="btnSave">Save</button>
+        <button type="button" class="btn btn-primary" id="btnUpdate">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+
+$("#btnAdd").click(function(){
+    $.ajax({
+        url:"Student/_Create",
+        method:"Get",
+        success:function(response){
+            $("#modalBody").html(response);
+            $(".modal").show();
+            $("#btnUpdate").hide();
+            $("#btnSave").show();
+        },
+        error:function(){
+
+        },
+    });//ajax
+});//btnAdd
+
+function Edit(btn){
+    var id=btn.id;
+    $.ajax({
+        url:"Student/_Edit",
+        method:"Get",
+        data:{id:id},
+        success:function(response){
+            $("#modalBody").html(response);
+            $(".modal").show();
+            $("#btnSave").hide();
+            $("#btnUpdate").show();
+        },
+        error:function(){
+
+        },
+    });//ajax
+}
+
+
+function Details(btn){
+    var id=btn.id;
+    $.ajax({
+        url:"Student/_Details",
+        method:"Get",
+        data:{id:id},
+        success:function(response){
+            $("#modalBody").html(response);
+            $(".modal").show();
+            $("#btnSave").hide();
+            $("#btnUpdate").hide();
+        },
+        error:function(){
+
+        },
+    });//ajax
+}
+
+function Delete(btn)
+{
+    var id=btn.id;
+    $.ajax({
+        url:"Student/Delete",
+        method:"Get",
+        data:{id:id},
+        success:function(response){
+            if(response=="ok")
+                {
+                    alert("Deleted");
+                    $('#ajaxresult').load('@Url.Action("_StudentsList")');
+                    $(".modal").hide();
+                    $('.modal-backdrop').remove();
+                    
+                }
+                else{
+                    alert("Delete failed");
+                }
+        },
+        error:function(){
+
+        },
+    });//ajax
+}
+
+
+
+$("#btnSave").click(function(){
+        debugger;
+        var AddList=JSON.stringify(GetAddresses());
+        console.log(AddList);
+        var detail=JSON.stringify(GetDetail());        
+        $.ajax({
+            url:"Student/Create",
+            method:"Post",
+            data:{addressList:AddList,detail:detail},
+            success:function(response){
+                if(response=="ok")
+                {
+                    alert("Inserted");    
+                    $('#ajaxresult').load('@Url.Action("_StudentsList")');
+                    $(".modal").hide();
+                    $('.modal-backdrop').remove();
+                }
+                else{
+                    alert("Insert failed");
+                }
+            },
+            error:function(error){
+                console.log(error);
+            }
+        });
+    });
+</script>
